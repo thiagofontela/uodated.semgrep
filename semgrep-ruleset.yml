@@ -1,15 +1,16 @@
-# semgrep ruleset: use official Semgrep Registry packs for automated updates
-# This file replaces local rules and points to curated packs.
-# Keep this file at repository root so semgrep-action picks it up by default.
+# Official Semgrep Registry Packs (Auto-Updated)
+# This file eliminates local rules and uses curated, maintained rulepacks.
+# It is automatically consumed by semgrep-action.
 
 config:
   - p/ci
   - p/java
   - p/security-audit
 
-# Optional: exclude test directories and generated code
+# Optional: ignore test and generated files
 exclude:
   - 'src/test/**'
   - '**/generated/**'
 
-# If you need to add local exceptions later, add them under 'rules' with careful review.
+# Add rule overrides here ONLY if needed
+rules: []
