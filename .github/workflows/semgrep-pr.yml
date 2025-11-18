@@ -1,9 +1,8 @@
-name: Semgrep (Pull Request Scan)
+name: Semgrep (PR Scan)
 
 on:
   pull_request:
     branches: [ "main" ]
-    paths: [ "**/*.java", "**/*.xml", "**/*.yml" ]
 
 permissions:
   contents: read
@@ -17,15 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Semgrep on PR code
+      - name: Run Semgrep
         uses: returntocorp/semgrep-action@v1
         with:
           config: p/ci,p/java,p/security-audit
-          generateSarif: "1"
-          fail_on_error: "false"
 
-      - name: Upload SARIF to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: semgrep.sarif
+      - name: Upload SARIF to GitHub Code Scanning
         if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: .semgrep/semgrep.sarif
