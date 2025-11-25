@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Semgrep PR Scan (Cloud + PR Comments)
+      - name: Run Semgrep (Docker) + Cloud + PR Comments
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: |
@@ -25,13 +25,12 @@ jobs:
             -v "${PWD}:/src" \
             -w /src \
             returntocorp/semgrep:latest \
-              scan \
-                --config p/ci \
-                --config p/java \
-                --config p/security-audit \
-                --sarif --output semgrep.sarif \
-                --auth-token "$SEMGREP_APP_TOKEN" \
-                --comment
+              --config p/ci \
+              --config p/java \
+              --config p/security-audit \
+              --sarif --output semgrep.sarif \
+              --auth-token "$SEMGREP_APP_TOKEN" \
+              --comment
 
       - name: Upload SARIF
         if: always()
