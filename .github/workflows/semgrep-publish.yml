@@ -11,24 +11,18 @@ permissions:
 jobs:
   semgrep:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Manual Full Scan + Cloud Upload
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        run: |
-          docker run --rm \
-            -v "${PWD}:/src" \
-            -w /src \
-            returntocorp/semgrep:latest \
-            semgrep \
-              --config p/ci \
-              --config p/java \
-              --config p/security-audit \
-              --sarif --output semgrep.sarif \
-              --auth-token "$SEMGREP_APP_TOKEN"
+      - name: Semgrep Manual Cloud Scan
+        uses: semgrep/semgrep-action@v3
+        with:
+          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
+          config: |
+            p/ci
+            p/java
+            p/security-audit
+          generateSarif: true
 
       - name: Upload SARIF
         if: always()
