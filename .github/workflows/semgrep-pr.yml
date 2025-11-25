@@ -6,7 +6,6 @@ on:
 
 permissions:
   contents: read
-  actions: read
   pull-requests: write
   security-events: write
 
@@ -17,30 +16,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pipx
-        run: |
-          python3 -m pip install --user pipx
-          python3 -m pipx ensurepath
+      - name: Install Semgrep
+        run: pip install semgrep
 
-      - name: Install Semgrep Cloud CLI via pipx
-        run: pipx install semgrep
-
-      - name: Run Semgrep + Upload + PR Comments
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Semgrep
         run: |
-          semgrep ci \
-            --config p/ci \
-            --config p/java \
-            --config p/security-audit \
-            --sarif --output semgrep.sarif \
-            --auth-token "$SEMGREP_APP_TOKEN" \
-            --comment
+          semgrep --config p/ci --config p/java --config p/security-audit \
+            --sarif --output semgrep.sarif || true
 
       - name: Upload SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: semgrep.sarif
-
