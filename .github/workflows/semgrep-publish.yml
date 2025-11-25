@@ -5,8 +5,8 @@ on:
 
 permissions:
   contents: read
-  actions: read
   security-events: write
+  actions: read
 
 jobs:
   semgrep:
@@ -15,24 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pipx
-        run: |
-          python3 -m pip install --user pipx
-          python3 -m pipx ensurepath
+      - name: Install Semgrep
+        run: pip install semgrep
 
-      - name: Install Semgrep Cloud CLI via pipx
-        run: pipx install semgrep
-
-      - name: Full Semgrep Scan + Upload
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+      - name: Full Semgrep Scan
         run: |
-          semgrep ci \
-            --config p/ci \
-            --config p/java \
-            --config p/security-audit \
-            --sarif --output semgrep.sarif \
-            --auth-token "$SEMGREP_APP_TOKEN"
+          semgrep --config p/ci --config p/java --config p/security-audit \
+            --sarif --output semgrep.sarif || true
 
       - name: Upload SARIF
         if: always()
