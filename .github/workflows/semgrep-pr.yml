@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Semgrep (Docker) + Cloud + PR Comments
+      - name: Run Semgrep PR Scan (with Cloud + PR Comments)
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: |
@@ -25,6 +25,7 @@ jobs:
             -v "${PWD}:/src" \
             -w /src \
             returntocorp/semgrep:latest \
+            semgrep \
               --config p/ci \
               --config p/java \
               --config p/security-audit \
