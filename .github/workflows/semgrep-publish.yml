@@ -5,8 +5,8 @@ on:
 
 permissions:
   contents: read
-  security-events: write
   actions: read
+  security-events: write
 
 jobs:
   semgrep:
@@ -38,4 +38,4 @@ jobs:
             -H "Authorization: Bearer $SEMGREP_APP_TOKEN" \
             -H "Content-Type: application/json" \
             --data-binary @semgrep.sarif \
-            https://semgrep.dev/api/v1/ci/upload
+            https://semgrep.dev/api/v1/scan
