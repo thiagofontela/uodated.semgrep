@@ -5,35 +5,29 @@ on:
     branches: [ "main" ]
 
 permissions:
-  pull-requests: write
   contents: read
-  actions: read
+  pull-requests: write
   security-events: write
+  actions: read
 
 jobs:
   semgrep:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Semgrep PR Scan (with Cloud + PR Comments)
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        run: |
-          docker run --rm \
-            -v "${PWD}:/src" \
-            -w /src \
-            returntocorp/semgrep:latest \
-            semgrep \
-              --config p/ci \
-              --config p/java \
-              --config p/security-audit \
-              --sarif --output semgrep.sarif \
-              --auth-token "$SEMGREP_APP_TOKEN" \
-              --comment
+      - name: Semgrep Cloud PR Scan + Comments
+        uses: semgrep/semgrep-action@v3
+        with:
+          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
+          config: |
+            p/ci
+            p/java
+            p/security-audit
+          generateSarif: true
+          comment: true
 
-      - name: Upload SARIF
+      - name: Upload SARIF to GitHub Code Scanning
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
