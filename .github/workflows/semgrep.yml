@@ -17,19 +17,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Semgrep
-        run: pip install semgrep
+      - name: Install Semgrep with Cloud Support
+        run: pip install "semgrep[cloud]" --upgrade
 
       - name: Run Semgrep + Upload to Semgrep Cloud
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: |
-          semgrep \
+          semgrep scan \
             --config p/ci \
             --config p/java \
             --config p/security-audit \
             --sarif --output semgrep.sarif \
-            --auth-token "$SEMGREP_APP_TOKEN"
+            --auth-token "$SEMGREP_APP_TOKEN" 
 
       - name: Upload SARIF to GitHub Code Scanning
         if: always()
