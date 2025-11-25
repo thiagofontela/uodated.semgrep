@@ -20,8 +20,16 @@ jobs:
       - name: Install Semgrep
         run: pip install semgrep
 
-      - name: Run Semgrep with Registry Packs
-        run: semgrep --config p/ci --config p/java --config p/security-audit --sarif --output semgrep.sarif
+      - name: Run Semgrep + Upload to Semgrep Cloud
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        run: |
+          semgrep \
+            --config p/ci \
+            --config p/java \
+            --config p/security-audit \
+            --sarif --output semgrep.sarif \
+            --auth-token "$SEMGREP_APP_TOKEN"
 
       - name: Upload SARIF to GitHub Code Scanning
         if: always()
