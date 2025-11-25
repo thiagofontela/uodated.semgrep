@@ -11,18 +11,28 @@ permissions:
 jobs:
   semgrep:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Semgrep Manual Cloud Scan
-        uses: semgrep/semgrep-action@v3
-        with:
-          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
-          config: |
-            p/ci
-            p/java
-            p/security-audit
-          generateSarif: true
+      - name: Install pipx
+        run: |
+          python3 -m pip install --user pipx
+          python3 -m pipx ensurepath
+
+      - name: Install Semgrep Cloud CLI via pipx
+        run: pipx install semgrep
+
+      - name: Full Semgrep Scan + Upload
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        run: |
+          semgrep ci \
+            --config p/ci \
+            --config p/java \
+            --config p/security-audit \
+            --sarif --output semgrep.sarif \
+            --auth-token "$SEMGREP_APP_TOKEN"
 
       - name: Upload SARIF
         if: always()
