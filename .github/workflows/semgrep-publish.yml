@@ -15,14 +15,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Semgrep
-        run: pip install semgrep
+      - name: Manual Full Scan + Cloud Upload
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        run: |
+          docker run --rm \
+            -v "${PWD}:/src" \
+            -w /src \
+            returntocorp/semgrep:latest \
+              scan \
+                --config p/ci \
+                --config p/java \
+                --config p/security-audit \
+                --sarif --output semgrep.sarif \
+                --auth-token "$SEMGREP_APP_TOKEN"
 
-      - name: Run Full Semgrep Scan
-        run: semgrep --config p/ci --config p/java --config p/security-audit --sarif --output semgrep.sarif
-
-      - name: Upload SARIF to GitHub Code Scanning
+      - name: Upload SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: semgrep.sarif
+
