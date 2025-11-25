@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Manual Full Scan + Cloud Upload
+      - name: Manual Full Scan (Docker) + Cloud Upload
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: |
@@ -23,16 +23,14 @@ jobs:
             -v "${PWD}:/src" \
             -w /src \
             returntocorp/semgrep:latest \
-              scan \
-                --config p/ci \
-                --config p/java \
-                --config p/security-audit \
-                --sarif --output semgrep.sarif \
-                --auth-token "$SEMGREP_APP_TOKEN"
+              --config p/ci \
+              --config p/java \
+              --config p/security-audit \
+              --sarif --output semgrep.sarif \
+              --auth-token "$SEMGREP_APP_TOKEN"
 
       - name: Upload SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: semgrep.sarif
-
