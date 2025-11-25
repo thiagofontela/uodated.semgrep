@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
 
 permissions:
+  pull-requests: write
   contents: read
   actions: read
   security-events: write
@@ -19,8 +20,17 @@ jobs:
       - name: Install Semgrep
         run: pip install semgrep
 
-      - name: Run Semgrep PR Scan
-        run: semgrep --config p/ci --config p/java --config p/security-audit --sarif --output semgrep.sarif
+      - name: Run Semgrep + Upload + PR Comments
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        run: |
+          semgrep \
+            --config p/ci \
+            --config p/java \
+            --config p/security-audit \
+            --sarif --output semgrep.sarif \
+            --auth-token "$SEMGREP_APP_TOKEN" \
+            --comment
 
       - name: Upload SARIF to GitHub Code Scanning
         if: always()
