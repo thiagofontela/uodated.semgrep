@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Manual Full Scan (Docker) + Cloud Upload
+      - name: Manual Full Scan + Cloud Upload
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: |
@@ -23,6 +23,7 @@ jobs:
             -v "${PWD}:/src" \
             -w /src \
             returntocorp/semgrep:latest \
+            semgrep \
               --config p/ci \
               --config p/java \
               --config p/security-audit \
