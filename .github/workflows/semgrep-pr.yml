@@ -17,14 +17,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Semgrep
-        run: pip install semgrep
+      - name: Install Semgrep with Cloud Support
+        run: pip install "semgrep[cloud]" --upgrade
 
       - name: Run Semgrep + Upload + PR Comments
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: |
-          semgrep \
+          semgrep scan \
             --config p/ci \
             --config p/java \
             --config p/security-audit \
